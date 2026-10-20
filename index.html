@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>igntu.confession</title>
+    <!-- Google Font (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2canvas Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary-pink: #ff4d8d;
+            --primary-hover: #e03a75;
+            --bg-light-pink: #fff0f5;
+            --card-bg: rgba(255, 255, 255, 0.96);
+            --text-dark: #2d1520;
+            --text-muted: #885b71;
+            --border-pink: #ffd1e1;
+            --shadow-pink: 0 15px 35px rgba(255, 77, 141, 0.2);
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
+        body {
+            background: linear-gradient(135deg, #ffeef4 0%, #ffd6e5 50%, #ffc2d6 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            color: var(--text-dark);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            color: var(--primary-pink);
+            font-size: 1.2rem;
+            animation: floatUp 1.8s ease-out forwards;
+            z-index: 9999;
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.8) rotate(0deg); }
+            50% { transform: translateY(-50px) scale(1.2) rotate(15deg); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.5) rotate(-15deg); }
+        }
+
+        .music-player {
+            position: fixed; top: 15px; right: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--primary-pink);
+            padding: 6px 14px; border-radius: 30px;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 6px 20px rgba(255, 77, 141, 0.25);
+            z-index: 1000; backdrop-filter: blur(10px);
+        }
+
+        .music-btn {
+            background: var(--primary-pink); color: white; border: none;
+            width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.85rem;
+        }
+        .music-info { font-size: 0.75rem; font-weight: 600; color: var(--primary-pink); max-width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .app-container {
+            width: 100%; max-width: 850px;
+            background: var(--card-bg); backdrop-filter: blur(12px);
+            border-radius: var(--radius); box-shadow: var(--shadow-pink);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            overflow: hidden; display: flex; flex-direction: column;
+            margin-top: 50px; word-wrap: break-word;
+        }
+
+        header {
+            background: linear-gradient(90deg, #ff4d8d, #ff75a0);
+            padding: 18px 20px; color: white;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+        }
+        header h1 { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+        .role-switch { display: flex; background: rgba(255, 255, 255, 0.25); padding: 3px; border-radius: 30px; }
+        .role-btn { background: transparent; border: none; padding: 6px 16px; color: white; font-weight: 500; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.3s; }
+        .role-btn.active { background: white; color: var(--primary-pink); box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+
+        .panel { padding: 20px; display: none; }
+        .panel.active { display: block; }
+
+        .gform-card {
+            background: #fff0f5; border: 2px dashed var(--primary-pink); border-radius: 14px;
+            padding: 16px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+        }
+        .gform-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 200px; }
+        .gform-info i { font-size: 1.8rem; color: var(--primary-pink); }
+        .btn-gform {
+            background: var(--primary-pink); color: white; text-decoration: none; padding: 10px 18px;
+            border-radius: 10px; font-size: 0.88rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+        }
+
+        .divider { text-align: center; margin: 20px 0; position: relative; }
+        .divider::before { content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: var(--border-pink); }
+        .divider span { position: relative; background: #fff; padding: 0 15px; color: var(--text-muted); font-size: 0.82rem; }
+
+        .form-row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .form-row .form-group { flex: 1; min-width: 220px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 500; font-size: 0.9rem; }
+
+        .form-control {
+            width: 100%; padding: 12px 16px; border: 2px solid var(--border-pink); border-radius: 12px;
+            outline: none; font-size: 0.92rem; background: #fff;
+        }
+        .form-control:focus { border-color: var(--primary-pink); box-shadow: 0 0 12px rgba(255, 77, 141, 0.2); }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        .upload-box {
+            border: 2px dashed var(--primary-pink); border-radius: 12px; padding: 22px;
+            text-align: center; background: var(--bg-light-pink); cursor: pointer;
+        }
+        .upload-box i { font-size: 2.2rem; color: var(--primary-pink); margin-bottom: 6px; }
+        #imageInput { display: none; }
+
+        .preview-container { margin-top: 12px; display: none; position: relative; max-width: 140px; }
+        .preview-container img { width: 100%; border-radius: 10px; border: 2px solid var(--primary-pink); max-height: 140px; object-fit: cover; }
+        .remove-img-btn { position: absolute; top: -6px; right: -6px; background: #ff3366; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; }
+
+        .btn-submit {
+            width: 100%; background: var(--primary-pink); color: white; border: none; padding: 14px;
+            border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+
+        .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+        .clear-btn { background: #ffedef; color: #ff3366; border: 1px solid #ffd1d8; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
+        .admin-sub-tabs { display: flex; gap: 6px; background: #fff0f5; padding: 4px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--border-pink); }
+        .sub-tab-btn { flex: 1; background: transparent; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 0.82rem; color: var(--text-muted); cursor: pointer; text-align: center; }
+        .sub-tab-btn.active { background: var(--primary-pink); color: white; }
+
+        .search-input { width: 100%; padding: 10px 14px; border: 2px solid var(--border-pink); border-radius: 10px; outline: none; font-size: 0.88rem; background: #fff; margin-bottom: 12px; }
+
+        .messages-list { display: flex; flex-direction: column; gap: 14px; max-height: 420px; overflow-y: auto; }
+        .message-card { background: #fff; border: 1px solid var(--border-pink); border-left: 4px solid var(--primary-pink); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .message-header { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); border-bottom: 1px solid #fce8f0; padding-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+        .user-name { font-weight: 600; color: var(--primary-pink); }
+        .ig-link { color: #e1306c; text-decoration: none; font-weight: 500; }
+        .message-image { max-width: 100%; max-height: 220px; border-radius: 8px; object-fit: contain; background: #fff0f5; padding: 3px; }
+
+        .admin-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; border-top: 1px dashed var(--border-pink); padding-top: 8px; }
+        .action-btn { padding: 6px 12px; border-radius: 8px; border: none; font-size: 0.78rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
+        .btn-story { background: linear-gradient(45deg, #f09433, #dc2743); color: white; }
+        .btn-dm { background: #0095f6; color: white; }
+        .btn-copy { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
+        .btn-status-toggle { background: #e6fcf5; color: #0ca678; margin-left: auto; }
+        .btn-status-toggle.completed { background: #fff3bf; color: #f59f00; }
+
+        #storyTemplate { position: fixed; left: -9999px; top: 0; width: 1080px; height: 1920px; background: linear-gradient(135deg, #ffeef4 0%, #ffd6e5 50%, #ffc2d6 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 80px; text-align: center; }
+        .story-card-box { background: rgba(255, 255, 255, 0.95); border-radius: 40px; padding: 60px; width: 100%; max-width: 900px; border: 3px solid var(--border-pink); display: flex; flex-direction: column; gap: 30px; }
+        .story-header { font-size: 2.2rem; color: var(--primary-pink); font-weight: 700; }
+        .story-msg { font-size: 2.8rem; color: var(--text-dark); line-height: 1.5; }
+        .story-footer { font-size: 1.8rem; color: var(--text-muted); border-top: 2px solid var(--border-pink); padding-top: 25px; }
+        .no-data { text-align: center; padding: 40px 10px; color: var(--text-muted); font-size: 0.95rem; }
+
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .app-container { margin-top: 60px; }
+            header { flex-direction: column; align-items: flex-start; }
+            .role-switch { width: 100%; justify-content: center; }
+            .panel { padding: 15px; }
+            .music-player { top: 10px; right: 10px; padding: 4px 10px; }
+            .music-info { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="music-player">
+        <span class="music-info" id="musicTitle">No Song</span>
+        <button class="music-btn" onclick="togglePlay()"><i class="fa-solid fa-play" id="playIcon"></i></button>
+        <button class="music-btn" onclick="document.getElementById('audioInput').click()"><i class="fa-solid fa-music"></i></button>
+        <input type="file" id="audioInput" accept="audio/*" style="display: none;" onchange="loadAudio(event)">
+        <audio id="bgAudio" loop></audio>
+    </div>
+
+    <div id="storyTemplate">
+        <div class="story-card-box">
+            <div class="story-header"><i class="fa-solid fa-heart"></i> IGNTU Confession</div>
+            <div class="story-msg" id="storyMsgText">मैसेज यहाँ दिखेगा</div>
+            <div class="story-footer" id="storyUserFooter">- From Anonymous</div>
+        </div>
+    </div>
+
+    <div class="app-container">
+        <header>
+            <h1><i class="fa-solid fa-heart"></i> igntu.confession</h1>
+            <div class="role-switch">
+                <button class="role-btn active" id="userTabBtn" onclick="switchTab('user')">User Panel</button>
+                <button class="role-btn" id="adminTabBtn" onclick="requestAdminAccess()">Admin View</button>
+            </div>
+        </header>
+
+        <div class="panel active" id="userPanel">
+            <div class="gform-card">
+                <div class="gform-info">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <div>
+                        <h3>गूगल फॉर्म भरें (Google Form)</h3>
+                        <p>विस्तृत जानकारी दर्ज करने के लिए फॉर्म भरें।</p>
+                    </div>
+                </div>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdGBSwWytUFJO9dhQY-l91lBb7INB4_hw256AZcP-lVJJscWg/viewform" target="_blank" class="btn-gform">फॉर्म खोलें</a>
+            </div>
+
+            <div class="divider"><span>या डायरेक्ट मैसेज भेजें</span></div>
+
+            <form id="submissionForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-user"></i> आपका नाम (Name)</label>
+                        <input type="text" id="userName" class="form-control" placeholder="नाम दर्ज करें..." required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fa-brands fa-instagram" style="color: #e1306c;"></i> इंस्टाग्राम आईडी (Instagram ID)</label>
+                        <input type="text" id="instaId" class="form-control" placeholder="@your_handle (Optional)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-pen"></i> मैसेज लिखिये (Message)</label>
+                    <textarea id="messageText" class="form-control" placeholder="यहाँ संदेश लिखें..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-image"></i> फोटो संलग्न करें (Attach Image)</label>
+                    <div class="upload-box" onclick="document.getElementById('imageInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p id="uploadText">यहाँ क्लिक करके फोटो चुनें (Optional)</p>
+                        <input type="file" id="imageInput" accept="image/*" onchange="handleImageSelect(event)">
+                    </div>
+                    <div class="preview-container" id="previewContainer">
+                        <img id="imagePreview" src="" alt="Preview">
+                        <button type="button" class="remove-img-btn" onclick="removeImage()"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit"><i class="fa-solid fa-paper-plane"></i> भेजिए (Send Message)</button>
+            </form>
+        </div>
+
+        <div class="panel" id="adminPanel">
+            <div class="admin-header">
+                <h2><i class="fa-solid fa-inbox"></i> एडमिन डैशबोर्ड</h2>
+                <button class="clear-btn" onclick="clearAllMessages()"><i class="fa-solid fa-trash-can"></i> Clear All</button>
+            </div>
+
+            <div class="admin-sub-tabs">
+                <button class="sub-tab-btn active" id="subTabAll" onclick="switchAdminSubTab('all')">📥 All</button>
+                <button class="sub-tab-btn" id="subTabPending" onclick="switchAdminSubTab('pending')">⏳ Pending</button>
+                <button class="sub-tab-btn" id="subTabCompleted" onclick="switchAdminSubTab('completed')">✅ Completed</button>
+            </div>
+
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 नाम या मैसेज से खोजें..." onkeyup="loadAdminMessages()">
+
+            <div class="messages-list" id="messagesList">
+                <div class="no-data">लोड हो रहा है...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FRONTEND LOGIC (Calling Backend APIs securely) -->
+    <script>
+        let base64ImageData = "";
+        let currentAdminTab = 'all';
+
+        document.addEventListener('click', function(e) {
+            if (['INPUT', 'TEXTAREA', 'BUTTON', 'A'].includes(e.target.tagName)) return;
+            const heart = document.createElement('i');
+            heart.className = 'fa-solid fa-heart heart-particle';
+            heart.style.left = (e.clientX - 10) + 'px';
+            heart.style.top = (e.clientY - 10) + 'px';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1800);
+        });
+
+        function switchTab(role) {
+            if (role === 'user') {
+                document.getElementById('userPanel').classList.add('active');
+                document.getElementById('adminPanel').classList.remove('active');
+                document.getElementById('userTabBtn').classList.add('active');
+                document.getElementById('adminTabBtn').classList.remove('active');
+            }
+        }
+
+        // Secure Login via Backend API
+        async function requestAdminAccess() {
+            const password = prompt("🔒 एडमिन पासवर्ड दर्ज करें:");
+            if (!password) return;
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    document.getElementById('adminPanel').classList.add('active');
+                    document.getElementById('userPanel').classList.remove('active');
+                    document.getElementById('adminTabBtn').classList.add('active');
+                    document.getElementById('userTabBtn').classList.remove('active');
+                    loadAdminMessages();
+                } else {
+                    alert("❌ " + result.error);
+                }
+            } catch (err) {
+                alert("कनेक्शन एरर!");
+            }
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64ImageData = e.target.result;
+                    document.getElementById('imagePreview').src = base64ImageData;
+                    document.getElementById('previewContainer').style.display = 'block';
+                    document.getElementById('uploadText').innerText = "फोटो: " + file.name;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeImage() {
+            base64ImageData = "";
+            document.getElementById('imageInput').value = "";
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('uploadText').innerText = "यहाँ क्लिक करके फोटो चुनें (Optional)";
+        }
+
+        // Submit via Backend API
+        document.getElementById('submissionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const sender = document.getElementById('userName').value.trim();
+            const instagram = document.getElementById('instaId').value.trim();
+            const message = document.getElementById('messageText').value.trim();
+
+            if (!message && !base64ImageData) {
+                alert('कृपया कोई मैसेज लिखें या फोटो अपलोड करें!');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender, instagram, message, image: base64ImageData })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('आपका संदेश सफलतापूर्वक भेज दिया गया है!');
+                    document.getElementById('submissionForm').reset();
+                    removeImage();
+                } else {
+                    alert('एरर: ' + result.error);
+                }
+            } catch (err) {
+                alert('डेटा भेजने में विफल!');
+            }
+        });
+
+        // Load Messages via Backend API
+        async function loadAdminMessages() {
+            const listContainer = document.getElementById('messagesList');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+
+            try {
+                const res = await fetch('/api/messages');
+                const result = await res.json();
+
+                if (!result.success) {
+                    listContainer.innerHTML = `<div class="no-data">डेटा लोड करने में एरर आई।</div>`;
+                    return;
+                }
+
+                let filtered = result.data.filter(item => 
+                    (item.sender && item.sender.toLowerCase().includes(searchQuery)) ||
+                    (item.message && item.message.toLowerCase().includes(searchQuery)) ||
+                    (item.instagram && item.instagram.toLowerCase().includes(searchQuery))
+                );
+
+                if (currentAdminTab === 'pending') filtered = filtered.filter(i => i.status === 'pending');
+                if (currentAdminTab === 'completed') filtered = filtered.filter(i => i.status === 'completed');
+
+                if (filtered.length === 0) {
+                    listContainer.innerHTML = `<div class="no-data"><i class="fa-solid fa-folder-open"></i><p>कोई संदेश नहीं मिला।</p></div>`;
+                    return;
+                }
+
+                listContainer.innerHTML = filtered.map(item => {
+                    const cleanInsta = item.instagram ? item.instagram.replace('@', '') : '';
+                    const isCompleted = item.status === 'completed';
+                    const timeStr = new Date(item.created_at).toLocaleString('hi-IN', { hour12: true });
+
+                    return `
+                    <div class="message-card">
+                        <div class="message-header">
+                            <div class="user-info-group">
+                                <span class="user-name"><i class="fa-solid fa-user-circle"></i> ${escapeHtml(item.sender)}</span>
+                                ${cleanInsta ? `<a href="https://instagram.com/${cleanInsta}" target="_blank" class="ig-link"><i class="fa-brands fa-instagram"></i> @${cleanInsta}</a>` : ''}
+                            </div>
+                            <span><i class="fa-regular fa-clock"></i> ${timeStr}</span>
+                        </div>
+                        ${item.message ? `<div class="message-text">${escapeHtml(item.message)}</div>` : ''}
+                        ${item.image ? `<img src="${item.image}" class="message-image" alt="Image">` : ''}
+                        <div class="admin-actions">
+                            <button class="action-btn btn-story" onclick="generateStory('${encodeURIComponent(item.message || '')}', '${encodeURIComponent(item.sender)}')"><i class="fa-solid fa-camera-retro"></i> Story</button>
+                            ${cleanInsta ? `<a href="https://instagram.com/direct/new/?username=${cleanInsta}" target="_blank" class="action-btn btn-dm"><i class="fa-brands fa-instagram"></i> DM</a>` : ''}
+                            ${item.message ? `<button class="action-btn btn-copy" onclick="copyText(this, '${escapeHtml(item.message)}')"><i class="fa-solid fa-copy"></i> Copy</button>` : ''}
+                            <button class="action-btn btn-status-toggle ${isCompleted ? 'completed' : ''}" onclick="toggleStatus(${item.id}, '${item.status}')">
+                                <i class="fa-solid ${isCompleted ? 'fa-rotate-left' : 'fa-check'}"></i> ${isCompleted ? 'Pending' : 'Completed'}
+                            </button>
+                        </div>
+                    </div>
+                `}).join('');
+            } catch (err) {
+                listContainer.innerHTML = `<div class="no-data">सर्वर से कनेक्ट नहीं हो सका।</div>`;
+            }
+        }
+
+        function switchAdminSubTab(tab) {
+            currentAdminTab = tab;
+            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('subTab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
+            loadAdminMessages();
+        }
+
+        async function toggleStatus(id, currentStatus) {
+            const newStatus = currentStatus === 'completed' ? 'pending' : 'completed';
+            await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: newStatus })
+            });
+            loadAdminMessages();
+        }
+
+        async function clearAllMessages() {
+            if (confirm('क्या आप सभी मैसेज डिलीट करना चाहते हैं?')) {
+                await fetch('/api/messages', { method: 'DELETE' });
+                loadAdminMessages();
+            }
+        }
+
+        function copyText(btn, text) {
+            navigator.clipboard.writeText(text).then(() => {
+                let orig = btn.innerHTML;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Copied!`;
+                setTimeout(() => btn.innerHTML = orig, 1500);
+            });
+        }
+
+        function generateStory(encMsg, encName) {
+            document.getElementById('storyMsgText').innerText = decodeURIComponent(encMsg);
+            document.getElementById('storyUserFooter').innerText = `- ${decodeURIComponent(encName)} (via IGNTU Confession)`;
+            html2canvas(document.getElementById('storyTemplate'), { scale: 2 }).then(canvas => {
+                let a = document.createElement('a');
+                a.href = canvas.toDataURL('image/png');
+                a.download = `IGNTU_Story_${Date.now()}.png`;
+                a.click();
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        const audio = document.getElementById('bgAudio');
+        function loadAudio(e) {
+            if (e.target.files[0]) {
+                audio.src = URL.createObjectURL(e.target.files[0]);
+                audio.play();
+                document.getElementById('playIcon').className = "fa-solid fa-pause";
+                document.getElementById('musicTitle').innerText = e.target.files[0].name;
+            }
+        }
+        function togglePlay() {
+            if (!audio.src) { document.getElementById('audioInput').click(); return; }
+            if (audio.paused) { audio.play(); document.getElementById('playIcon').className = "fa-solid fa-pause"; }
+            else { audio.pause(); document.getElementById('playIcon').className = "fa-solid fa-play"; }
+        }
+    </script>
+</body>
+</html>
